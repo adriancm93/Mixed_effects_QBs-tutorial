@@ -1,7 +1,7 @@
 # Mixed_effects_QBs (Code Example)
 **Mixed effects model using R** 
 
-*The purpose of this is to show how to build easy and simple mixed-effects models. However, the model used in this example is a work in progress, so any feedback will be greatly appreciated. 
+*The purpose of this is to show how to build easy and simple mixed-effects models. However, the model used in this example is a work in progress, so any feedback will be greatly appreciated*. 
 
 *Also, if you will be using the model (or base on the model) I would appreciate cite me as a source :)*
 
