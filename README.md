@@ -84,7 +84,7 @@ prev_play <- dataraw %>%
          !is_na(passer_player_name),
          play_type=='pass')
 ```
-Next, I selected and engineered a bunch of variables that I thought might be relevant. **This model is not yet finished**. Most probably I'll use or create more variables (most of the ones shown here won't make it). **Feedback is very much appreciated**. I will explain my YAC and AIR variable once I publish the finished model.
+Next, I selected and engineered a bunch of variables that I thought might be relevant. **This model is not yet finished**. Most probably I'll use or create more variables (most of the ones shown here won't make it). **Feedback is very much appreciated**. I will explain my YAC and QBYards variable once I publish the finished model.
 ```
 epa_data<-data_filt %>% 
   select(game_id, play_id, epa,yac_epa, air_epa,ep,posteam,defteam,season,
@@ -106,7 +106,7 @@ epa_data<-data_filt %>%
     t = paste(play_id,game_id,season),
     converted = if_else(yards_gained - ydstogo>0,1,0),
     YAC = if_else(is.na(yards_after_catch),0,yards_after_catch),
-    AIR = if_else( is.na(air_yards) & yards_gained < 0 , yards_gained , if_else(is.na(air_yards),0,air_yards)),
+    QBYards = if_else( is.na(air_yards) & yards_gained < 0 , yards_gained , if_else(is.na(air_yards),0,air_yards)),
     prev_play_run = if_else(previous_play=='run',1,0),
     first_play_drive = if_else(previous_play=='First play of Drive',1,0)
   ) 
@@ -126,7 +126,7 @@ mixed<-lmer(epa ~
                log_ydstogo*down +
                half_seconds_remaining +
                YAC +
-               AIR +
+               QBYards +
                away + 
                roof +
                (1|passer_player_name), data=epa_data)
