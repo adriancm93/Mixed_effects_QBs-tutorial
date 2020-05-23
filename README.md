@@ -107,7 +107,7 @@ epa_data<-data_filt %>%
     t = paste(play_id,game_id,season),
     converted = if_else(yards_gained - ydstogo>0,1,0),
     YAC = if_else(is.na(yards_after_catch),0,yards_after_catch),
-    AIR = if_else(is.na(air_yards),0,air_yards ),
+    AIR = if_else( is.na(air_yards) & yards_gained < 0 , yards_gained , if_else(is.na(air_yards),0,air_yards)),
     prev_play_run = if_else(previous_play=='run',1,0),
     first_play_drive = if_else(previous_play=='First play of Drive',1,0)
   ) 
