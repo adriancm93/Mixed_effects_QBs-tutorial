@@ -3,7 +3,6 @@
 
 *The purpose of this is to show how to build easy and simple mixed-effects models. However, the model used in this example is a work in progress, so any feedback will be greatly appreciated*. 
 
-*Also, if you will be using the model (or base on the model) I would appreciate cite me as a source :)*
 
 **Packages**
 
@@ -120,7 +119,7 @@ plays_qb <- epa_data %>%
     num_plays = n()
   );colnames(plays_qb)[1] <- 'level'
 ```
-**And THIS is the mixed-effects model**. The random variable is specified this way:```+(1|passer_player_name)```, the other are fixed effects. To add more random-effects just add another ```+(1|name_of_variable)``` before ```,data=```. *When I mentioned citing me if using the model I was talking about this formula:*
+**And THIS is the mixed-effects model**. The random variable is specified this way:```+(1|passer_player_name)```, the other are fixed effects. To add more random-effects just add another ```+(1|name_of_variable)``` before ```,data=```. 
 ```
 mixed<-lmer(epa ~ 
                yardline_100 +
