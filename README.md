@@ -7,7 +7,7 @@
 
 The Goal is to do a "QB ranking" by finding the intercept (β0) for every QB in the sample when trying to predict EPA. In other words, how is each QB contributing to EPA on a given play? Which QBs are even statistically significant at doing this? (significant being β0_i != 0 at a specific level). 
 
-To do so, I want to control for things that the QB can't really control for in a given situation. For example:
+To do so, I want to control for things that the QB can't control for in a given situation. For example:
 - Yards-to-go for a first down (```ydstogo```)
 - Down (```down```)
 - ```ydstogo```*```down``` (for those coaches who love putting their QB's on 3rd and long)
@@ -16,18 +16,11 @@ To do so, I want to control for things that the QB can't really control for in a
 - Half’s seconds reminding
 - Quarter
 
-My logic for the later three points is that I believe those might affect the way a coach calls a game. Other variables that I tested and found none or little evidence of being relevant:
-
-- Roof type (dome/outdoors/retractable)
-- Away/home game for position team
-
-*Originally, I had Air Yards and Yards-after-catch (YAC), but thankfully, some members of the analytics twitter community talked me out of it. YAC is definitely dependent on the QB completing the pass, which has a degree of collinearity with the QB' abilities.*
+My logic for the later three points is that I believe those might affect the way a coach calls a game. 
 
 **Controlling for Pass Routes and Coverage grades**
 
-I am using PFF grades for pass routes, opposing coverage, pass-block, and opposing pass-rush at a game-by-game level. For copyright reasons I cannot share that data, so the code I used to merge the datasets, and the use of those variables, will not be part of this piece. (Just as a hint, the ```defid``` and ```posid``` variables I engineer in the following code are part of the data merging process) 
-
-However I would like to mention that I found best to add an interaction term between opposing coverage and posession pass routes grades: ```pos_RECV``` * ```def_COV```. This to avoid the model to penalizing QBs with good receivers too much. 
+I used PFF grades for pass routes, opposing coverage, pass-block, and opposing pass-rush at a game-by-game level. For copyright reasons I cannot share that data. However I would like to mention that I found best to add an interaction term between opposing coverage and posession pass routes grades: ```pos_RECV``` * ```def_COV```. This to avoid the model to penalizing QBs with good receivers too much. 
 
 
 **Packages**
@@ -54,8 +47,7 @@ EPA models come from nflscrapR: https://github.com/maksimhorowitz/nflscrapR
 
 **Get data**
 
-I got this code from nflfastR's documentation. I also added variables: ```start``` and ```end``` to be used later in the graph. Other ways to get data is using the SQLite package as shown in Tom Mock's (@thomas_mock) awesome #HANIC x NFL panel presentation: https://jthomasmock.github.io/nfl_hanic/#1
-
+I got this code from nflfastR's documentation. Other ways to get data is using the SQLite package as shown in Tom Mock's (@thomas_mock) awesome #HANIC x NFL panel presentation: https://jthomasmock.github.io/nfl_hanic/#1
 
 ``` 
 start<-2016
@@ -111,7 +103,7 @@ prev_play <- dataraw %>%
          !is_na(passer_player_name),
          play_type=='pass')
 ```
-Next, I selected and engineered a bunch of variables that I thought might be relevant. **This model is not yet finished**. Most probably I'll use or create more variables (most of the ones shown here won't make it). **Feedback is very much appreciated**. I will explain my YAC and QBYards variable once I publish the finished model.
+Next, I selected and engineered a bunch of variables that I thought might be relevant. **This model is not yet finished**. Most probably I'll use or create more variables (most of the ones shown here won't make it). **Feedback is very much appreciated**.
 ```
 epa_data<-data_filt %>% 
   select(game_id, play_id, epa,yac_epa, air_epa,ep,posteam,defteam,season,
@@ -132,8 +124,6 @@ epa_data<-data_filt %>%
     log_ydstogo = log(ydstogo),
     t = paste(play_id,game_id,season),
     converted = if_else(yards_gained - ydstogo>0,1,0),
-    YAC = if_else(is.na(yards_after_catch),0,yards_after_catch),
-    QBYards = if_else( is.na(air_yards) & yards_gained < 0 , yards_gained , if_else(is.na(air_yards),0,air_yards)),
     prev_play_run = if_else(previous_play=='run',1,0),
     first_play_drive = if_else(previous_play=='First play of Drive',1,0)
   ) 
@@ -157,6 +147,8 @@ mixed<-lmer(epa ~
               quarter4 +
               quarter4*down  +
               score_differential +
+              away + 
+              outdoor + 
               #def_COV*pos_RECV + (remember this is not public)
               (1|passer_player_name), 
             data=epa_data)
